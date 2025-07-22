@@ -9,6 +9,11 @@ OAuth + OIDC using OIDC fot obtain identity.
 
 OAuth 2.0 con OpenID Connect, el cual requiere una interacción del usuario mediante el navegador web.
 
+> 
+
+
+    psql -h db-instance-rds.c8le640i0kbl.us-east-1.rds.amazonaws.com -U p0stgr3s -d fixture -p 5432
+
 API de usuarios
 
 🔒 Esto está pensado para:

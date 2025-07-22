@@ -51,7 +51,7 @@ services:
       # DSN para la conexión a tu instancia de RDS.
       # ¡IMPORTANTE! Reemplaza los valores con los de tu RDS.
       # Usamos sslmode=require para RDS por seguridad.
-      POSTGRES_RDS_DSN: "host=db-instance-rds.c8le640i0kbl.us-east-1.rds.amazonaws.com port=5432 user=p0stgr3s password=p4rc3r02025! dbname=fixture sslmode=require"
+      POSTGRES_RDS_DSN: "host=db-instance-rds.c8le640i0kbl.us-east-1.rds.amazonaws.com port=5432 user=p0stgr3s password=p4rc3r02025! dbname=products sslmode=require"
       
       # Define esta variable para TRUE si quieres que la API se conecte a RDS cuando la levantes con Docker Compose.
       # Déjala comentada o en FALSE para que se conecte a la base de datos local.
