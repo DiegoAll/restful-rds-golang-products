@@ -1,28 +1,6 @@
 # restful-rds-golang-products
 
-
 restful-rds-golang-products
-
-consentscreen authentication only using Goog,le Credentials service.
-OAuth + OIDC using OIDC fot obtain identity.
-
-
-OAuth 2.0 con OpenID Connect, el cual requiere una interacción del usuario mediante el navegador web.
-
-> 
-
-
-    psql -h db-instance-rds.c8le640i0kbl.us-east-1.rds.amazonaws.com -U p0stgr3s -d fixture -p 5432
-
-API de usuarios
-
-🔒 Esto está pensado para:
-Aplicaciones web.
-Aplicaciones móviles.
-Aplicaciones desktop con navegador embebido.
-
-🔑 2. Service accounts (para GCP)
-Permiten autenticación automática sin intervención del usuario.
 
 
 ## Run application
@@ -31,12 +9,26 @@ Permiten autenticación automática sin intervención del usuario.
     docker-compose up --build -d
 
 
+## Accesss database
+
+    psql -h db-instance-rds.c8le640i0kbl.us-east-1.rds.amazonaws.com -U p0stgr3s -d products -p 5432
+
+
 ## API Endpoints
 
+    curl -X GET http://localhost:9090/v1/products
+
+    curl -X POST http://localhost:9090/v1/products \
+    -H "Content-Type: application/json" \
+    -H "X-API-Key: super_secreto_api_key_valida" \
+    -d '{
+        "name": "Nuevo Producto de Prueba",
+        "description": "Una descripción de este producto",
+        "price": 50.00
+    }'
 
 
 ##  Database Querys
-
 
     docker run -p 8081:8081 \
     -e PORT=8081 \

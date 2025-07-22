@@ -7,17 +7,14 @@ import (
 	"time"
 )
 
-// APIKeyRepository maneja las operaciones de base de datos para las API Keys.
 type APIKeyRepository struct {
 	DB *sql.DB
 }
 
-// NewAPIKeyRepository crea una nueva instancia de APIKeyRepository.
 func NewAPIKeyRepository(db *sql.DB) *APIKeyRepository {
 	return &APIKeyRepository{DB: db}
 }
 
-// ValidateAPIKey verifica si una API Key es válida y está activa en la base de datos.
 func (r *APIKeyRepository) ValidateAPIKey(ctx context.Context, apiKey string) (bool, error) {
 	query := `
         SELECT expires_at, active

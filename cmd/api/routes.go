@@ -29,15 +29,27 @@ func (app *application) routes() http.Handler {
 		// Rutas públicas de la V1
 		r.Get("/health", app.healthCheck)
 		// La ruta AllProducts es pública y no requiere API Key
-		r.Get("/products/all", app.AllProducts)
+		// MIDDLEWARE APLICADO
+		r.Get("/products", app.AllProducts) // Endpoint: GET /v1/products/
 
-		r.Route("/products", func(r chi.Router) {
-			// Aplica tu middleware de API Key personalizado a las rutas que lo requieran
-			// Se usa el alias 'customMiddleware' para referirse a tu paquete.
+		r.Group(func(r chi.Router) {
 			r.Use(customMiddleware.AuthAPIKeyMiddleware(app.apiKeyRepo))
-			r.Post("/", app.CreateProduct) // Esta ruta ahora requiere API Key
-			// r.Get("/", app.AllProducts) // Si esta ruta también requiriera autenticación, se dejaría aquí
+
+			// Rutas de productos PROTEGIDAS por la API Key
+			// La ruta base de este grupo es /v1/, así que /products/ aquí se convierte en /v1/products/
+			r.Post("/products", app.CreateProduct) // Endpoint: POST /v1/products/
+			// Si tuvieras otras rutas protegidas como GET /products/{id} o PUT /products/{id}, irían aquí:
+			// r.Get("/products/{id}", app.GetProduct)
+			// r.Put("/products/{id}", app.UpdateProduct)
 		})
+
+		// r.Route("/products", func(r chi.Router) {
+		// 	// Aplica tu middleware de API Key personalizado a las rutas que lo requieran
+		// 	// Se usa el alias 'customMiddleware' para referirse a tu paquete.
+		// 	r.Use(customMiddleware.AuthAPIKeyMiddleware(app.apiKeyRepo))
+		// 	r.Post("/products/", app.CreateProduct) // Esta ruta ahora requiere API Key
+		// 	// r.Get("/", app.AllProducts) // Si esta ruta también requiriera autenticación, se dejaría aquí
+		// })
 
 		// La línea 'mux.Post("/products", app.CreateProduct)' duplicada ha sido eliminada.
 		// Las rutas restantes que no requieren autenticación se mantienen públicas.

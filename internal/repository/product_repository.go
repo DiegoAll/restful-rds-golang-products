@@ -7,7 +7,7 @@ import (
 )
 
 // InternalTrafficRepository es una interfaz para operaciones de tráfico interno (productos).
-type InternalTrafficRepository interface {
+type ProductRepositoryInterface interface {
 	InsertProduct(ctx context.Context, record *models.Product) error
 	// Aquí se pueden añadir más métodos para productos, como Get, Update, Delete, GetAll
 	GetAllProducts(ctx context.Context) ([]models.Product, error)
@@ -19,7 +19,7 @@ type ProductsRepository struct {
 }
 
 // NewPostgresInternalTrafficRepository crea una nueva instancia de ProductsRepository.
-func NewPostgresInternalTrafficRepository(db *sql.DB) *ProductsRepository {
+func NewPostgresProductRepository(db *sql.DB) *ProductsRepository {
 	return &ProductsRepository{DB: db}
 }
 

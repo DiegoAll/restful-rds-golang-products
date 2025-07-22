@@ -10,7 +10,6 @@ CREATE TABLE api_keys (
     permissions TEXT[] -- opcional, por si deseas permisos por clave
 );
 
-
 CREATE TABLE api_keys (
     id SERIAL PRIMARY KEY,
     key TEXT UNIQUE NOT NULL,
@@ -19,8 +18,6 @@ CREATE TABLE api_keys (
     active BOOLEAN DEFAULT TRUE,
     permissions TEXT[]
 );
-
-
 
 CREATE TABLE products (
     id SERIAL PRIMARY KEY,

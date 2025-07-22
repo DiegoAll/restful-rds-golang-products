@@ -69,7 +69,7 @@ func main() {
 	}
 
 	// Inicializar los repositorios
-	productRepo := repository.NewPostgresInternalTrafficRepository(dbInstance.SQL)
+	productRepo := repository.NewPostgresProductRepository(dbInstance.SQL)
 	apiKeyRepo := repository.NewAPIKeyRepository(dbInstance.SQL)
 
 	app := &application{
