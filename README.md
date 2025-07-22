@@ -3,6 +3,21 @@
 
 restful-rds-golang-products
 
+consentscreen authentication only using Goog,le Credentials service.
+OAuth + OIDC using OIDC fot obtain identity.
+
+
+OAuth 2.0 con OpenID Connect, el cual requiere una interacción del usuario mediante el navegador web.
+
+API de usuarios
+
+🔒 Esto está pensado para:
+Aplicaciones web.
+Aplicaciones móviles.
+Aplicaciones desktop con navegador embebido.
+
+🔑 2. Service accounts (para GCP)
+Permiten autenticación automática sin intervención del usuario.
 
 
 ## Run application

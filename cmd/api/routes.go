@@ -24,10 +24,10 @@ func (app *application) routes() http.Handler {
 
 		// Rutas públicas de la V1
 
-		// r.Get("/health", app.systemController.HealthCheck)
-		// r.Post("/signup", app.authController.RegisterUser)
-		// r.Post("/callback", app.authController.Callback)
-		// r.Post("/login", app.authController.AuthenticateUser)
+		// r.Get("/health", app.HealthCheck)
+		// r.Post("/signup", app.Signup) // It's not required
+		r.Post("/callback", app.Callback)
+		r.Get("/login", app.Login)
 
 		// r.Post("/input", app.IngestData)
 
