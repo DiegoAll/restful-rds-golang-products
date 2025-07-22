@@ -1,17 +1,13 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"restful-rds-golang-products/database"
 	"restful-rds-golang-products/internal/pkg/logger"
-
-	"github.com/coreos/go-oidc"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
+	"restful-rds-golang-products/internal/repository"
 )
 
 type config struct {
@@ -23,20 +19,10 @@ type application struct {
 	infoLog  *log.Logger
 	errorLog *log.Logger
 	db       *database.DB
-	//middleware
+	// middleware *middleware.Middleware
+	productRepo *repository.ProductsRepository
+	apiKeyRepo  *repository.APIKeyRepository
 }
-
-var (
-	clientID    = "89960475367-37h7e26id256t33v5b7p5aho4kbv0gio.apps.googleusercontent.com"
-	oauthConfig = &oauth2.Config{
-		ClientID:     clientID,
-		ClientSecret: "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",
-		RedirectURL:  "http://localhost:8080/callback",
-		Scopes:       []string{oidc.ScopeOpenID, "profile", "email"},
-		Endpoint:     google.Endpoint,
-	}
-	verifier *oidc.IDTokenVerifier
-)
 
 func main() {
 
@@ -56,14 +42,6 @@ func main() {
 	// 	log.Fatal("Error: La variable de entorno POSTGRES_DSN no está definida.")
 	// }
 	// log.Printf("DEBUG: POSTGRES_DSN obtenido del entorno: %s", dsn)
-
-	ctx := context.Background()
-	provider, err := oidc.NewProvider(ctx, "https://accounts.google.com")
-	if err != nil {
-		log.Fatalf("No se pudo crear el proveedor OIDC: %v", err)
-	}
-
-	verifier = provider.Verifier(&oidc.Config{ClientID: clientID})
 
 	var dsn string
 	rdsEnabled := os.Getenv("RDS_ENABLED")
@@ -90,12 +68,18 @@ func main() {
 		log.Fatalf("Cannot connect to PostgreSQL: %v", err)
 	}
 
+	// Inicializar los repositorios
+	productRepo := repository.NewPostgresInternalTrafficRepository(dbInstance.SQL)
+	apiKeyRepo := repository.NewAPIKeyRepository(dbInstance.SQL)
+
 	app := &application{
-		config:   cfg,
-		infoLog:  logger.InfoLog,
-		errorLog: logger.ErrorLog,
-		db:       dbInstance,
-		//middleware:         mw,
+		config:      cfg,
+		infoLog:     logger.InfoLog,
+		errorLog:    logger.ErrorLog,
+		db:          dbInstance,
+		productRepo: productRepo,
+		apiKeyRepo:  apiKeyRepo,
+		// middleware: mw,
 	}
 
 	err = app.serve()

@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"net/http"
+	"restful-rds-golang-products/internal/pkg/logger"
 	"restful-rds-golang-products/internal/pkg/utils"
-
-	"golang.org/x/oauth2"
+	"restful-rds-golang-products/models"
+	"time"
 )
 
 type jsonResponse struct {
@@ -27,80 +27,64 @@ func (app *application) healthCheck(w http.ResponseWriter, r *http.Request) {
 	_ = utils.WriteJSON(w, http.StatusOK, payload)
 }
 
-func (app *application) Login(w http.ResponseWriter, r *http.Request) {
-	url := oauthConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+func (app *application) CreateProduct(w http.ResponseWriter, r *http.Request) {
+	var product models.Product
+
+	err := utils.ReadJSON(w, r, &product)
+	if err != nil {
+		logger.ErrorLog.Printf("Error al leer JSON en CreateProduct: %v", err)
+		utils.ErrorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	// Asignar timestamps (aunque el repositorio también podría hacerlo, es bueno tenerlo aquí para el modelo)
+	product.CreatedAt = time.Now()
+	product.UpdatedAt = time.Now()
+
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second) // Contexto con timeout
+	defer cancel()
+
+	err = app.productRepo.InsertProduct(ctx, &product)
+	if err != nil {
+		logger.ErrorLog.Printf("Error al insertar producto en la base de datos: %v", err)
+		utils.ErrorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: "Producto creado exitosamente",
+		Data:    product,
+	}
+
+	err = utils.WriteJSON(w, http.StatusCreated, payload)
+	if err != nil {
+		logger.ErrorLog.Printf("Error al escribir respuesta JSON en CreateProduct: %v", err)
+		// En este punto, no hay mucho que se pueda hacer más que loguear el error
+	}
 }
 
-func (app *application) Callback(w http.ResponseWriter, r *http.Request) {
-	ctx := context.Background()
+// List Product
+func (app *application) AllProducts(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second) // Contexto con timeout
+	defer cancel()
 
-	code := r.URL.Query().Get("code")
-	oauth2Token, err := oauthConfig.Exchange(ctx, code)
+	products, err := app.productRepo.GetAllProducts(ctx)
 	if err != nil {
-		http.Error(w, "No se pudo intercambiar el código por token", http.StatusInternalServerError)
+		logger.ErrorLog.Printf("Error al obtener todos los productos de la base de datos: %v", err)
+		utils.ErrorJSON(w, err, http.StatusInternalServerError)
 		return
 	}
 
-	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
-	if !ok {
-		http.Error(w, "No se encontró el id_token", http.StatusInternalServerError)
-		return
+	payload := jsonResponse{
+		Error:   false,
+		Message: "Productos obtenidos exitosamente",
+		Data:    products,
 	}
 
-	idToken, err := verifier.Verify(ctx, rawIDToken)
+	err = utils.WriteJSON(w, http.StatusOK, payload)
 	if err != nil {
-		http.Error(w, "Token inválido", http.StatusUnauthorized)
-		return
+		logger.ErrorLog.Printf("Error al escribir respuesta JSON en AllProducts: %v", err)
+		// En este punto, no hay mucho que se pueda hacer más que loguear el error
 	}
-
-	fmt.Println("✅ ID Token:", rawIDToken)
-	fmt.Println("✅ Access Token:", oauth2Token.AccessToken)
-
-	var claims struct {
-		Email string `json:"email"`
-	}
-
-	if err := idToken.Claims(&claims); err != nil {
-		http.Error(w, "No se pudieron obtener los claims", http.StatusInternalServerError)
-		return
-	}
-
-	fmt.Fprintf(w, "Autenticación exitosa. Bienvenido: %s", claims.Email)
-}
-
-func (app *application) Protected(w http.ResponseWriter, r *http.Request) {
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
-		http.Error(w, "Falta el header Authorization", http.StatusUnauthorized)
-		return
-	}
-
-	// El formato del header debe ser: "Bearer <token>"
-	const prefix = "Bearer "
-	if len(authHeader) <= len(prefix) || authHeader[:len(prefix)] != prefix {
-		http.Error(w, "Formato del token inválido", http.StatusUnauthorized)
-		return
-	}
-
-	rawIDToken := authHeader[len(prefix):]
-
-	ctx := r.Context()
-	idToken, err := verifier.Verify(ctx, rawIDToken)
-	if err != nil {
-		http.Error(w, "Token inválido", http.StatusUnauthorized)
-		return
-	}
-
-	var claims struct {
-		Email string `json:"email"`
-	}
-
-	if err := idToken.Claims(&claims); err != nil {
-		http.Error(w, "No se pudieron obtener los claims", http.StatusInternalServerError)
-		return
-	}
-
-	fmt.Fprintf(w, "Acceso concedido al usuario: %s", claims.Email)
-
 }
