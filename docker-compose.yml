@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # db_postgres:
+  #   hostname: enrich_customers
+  #   build:
+  #     context: ./database 
+  #     dockerfile: Dockerfile.postgresql
+  #   container_name: enrichcustomers_db
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     POSTGRES_DB: enrichcustomers
+  #     POSTGRES_USER: user
+  #     POSTGRES_PASSWORD: pass
+  #     POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+  #   volumes:
+  #     # - ./db-data/postgres_data:/bitnami/postgresql/:rw
+  #     - ./db-data/postgres:/var/lib/postgresql/data:rw
+
+  # db_mysql:
+  #   hostname: enrich_customers
+  #   build:
+  #     context: ./database/ 
+  #     dockerfile: Dockerfile.mysql
+  #   container_name: enrichcustomers_db
+  #   ports:
+  #     - "3306:3306"
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root_password
+  #     MYSQL_DATABASE: enrichcustomers
+  #     MYSQL_USER: user
+  #     MYSQL_PASSWORD: pass
+  #   volumes:
+  #     # - ./db-data/postgres_data:/bitnami/postgresql/:rw
+  #     # - ./db-data/mysql:/var/lib/mysql:rw
+  #     - mysql_data:/var/lib/mysql
+  api:
+    hostname: products_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: products_api
+    ports:
+      - "9090:9090"
+    environment:
+      PORT: 9090
+      # DSN para la conexión a la base de datos local de Docker Compose
+      POSTGRES_LOCAL_DSN: "host=db_postgres port=5432 user=user password=pass dbname=enrichcustomers sslmode=disable"
+      
+      # DSN para la conexión a tu instancia de RDS.
+      # ¡IMPORTANTE! Reemplaza los valores con los de tu RDS.
+      # Usamos sslmode=require para RDS por seguridad.
+      POSTGRES_RDS_DSN: "host=db-instance-rds.c8le640i0kbl.us-east-1.rds.amazonaws.com port=5432 user=p0stgr3s password=p4rc3r02025! dbname=fixture sslmode=require"
+      
+      # Define esta variable para TRUE si quieres que la API se conecte a RDS cuando la levantes con Docker Compose.
+      # Déjala comentada o en FALSE para que se conecte a la base de datos local.
+      RDS_ENABLED: "true" # Cambia a "true" para conectar a RDS localmente
+    # depends_on:
+    #   - db_postgres
