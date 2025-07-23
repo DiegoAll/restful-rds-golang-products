@@ -43,14 +43,6 @@ func (app *application) routes() http.Handler {
 			// r.Put("/products/{id}", app.UpdateProduct)
 		})
 
-		// r.Route("/products", func(r chi.Router) {
-		// 	// Aplica tu middleware de API Key personalizado a las rutas que lo requieran
-		// 	// Se usa el alias 'customMiddleware' para referirse a tu paquete.
-		// 	r.Use(customMiddleware.AuthAPIKeyMiddleware(app.apiKeyRepo))
-		// 	r.Post("/products/", app.CreateProduct) // Esta ruta ahora requiere API Key
-		// 	// r.Get("/", app.AllProducts) // Si esta ruta también requiriera autenticación, se dejaría aquí
-		// })
-
 		// La línea 'mux.Post("/products", app.CreateProduct)' duplicada ha sido eliminada.
 		// Las rutas restantes que no requieren autenticación se mantienen públicas.
 		// mux.Get("/products/get/{id}", app.GetProduct)
