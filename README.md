@@ -3,6 +3,34 @@
 restful-rds-golang-products
 
 
+Amazon Virtual Private Cloud Public IPv4 Addresses - $0.32
+$0.005 por dirección IPv4 pública en uso por hora × 63.019 horas
+
+Este cobro NO es por la RDS directamente, sino por el uso de una dirección IP pública asignada a un recurso dentro de tu VPC (como una instancia EC2, una interfaz de red, etc.).
+
+Aunque tengas una RDS en el Free Tier, el uso de direcciones IP públicas tiene un costo si:
+
+Tienes una Elastic IP (IP pública fija) asignada pero no asociada a una instancia activa
+
+O si tienes una interfaz de red (ENI) que tenga una IP pública en uso (por ejemplo, una EC2 en ejecución)
+
+📌 RDS NO utiliza una IP pública por defecto, a menos que la configures como accesible públicamente ("Publicly Accessible = true")
+
+    aws ec2 modify-subnet-attribute \
+    --subnet-id subnet-07ab674ef6e9292c6 \
+    --map-public-ip-on-launch
+
+**0.005 por hora = 30 COP (La Ip publica de la RDS) 0.005 * 24 H = 483.870 COP (24 H)**
+
+Lo que hace es habilitar que todas las instancias lanzadas en esa subred reciban automáticamente una IP pública dinámica (no Elastic IP, pero igual tiene costo si está en uso).
+
+Aunque la RDS no se lanza directamente en esa subnet pública, si configuraste tu RDS como “publicly accessible” y le asignaste una IP pública al momento de crearla, entonces AWS te cobra $0.005 por hora mientras esa IP está en uso.
+
+
+
+---------------------------------------
+
+
 No, no es estrictamente obligatorio usar el SDK de AWS Go para interactuar con Cognito, pero es altamente recomendable y la forma más práctica y segura de hacerlo.
 
 
