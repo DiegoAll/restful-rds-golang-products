@@ -7,6 +7,8 @@ import (
 	"restful-rds-golang-products/internal/pkg/utils"
 	"restful-rds-golang-products/models"
 	"time"
+
+	"github.com/aws/aws-sdk-go/aws"
 )
 
 type jsonResponse struct {
@@ -17,6 +19,11 @@ type jsonResponse struct {
 
 type envelope map[string]interface{}
 
+type ConfirmRequest struct {
+	Email string `json:"email"`
+	Code  string `json:"code"`
+}
+
 func (app *application) healthCheck(w http.ResponseWriter, r *http.Request) {
 	// Prepara la respuesta JSON
 	payload := jsonResponse{
@@ -25,6 +32,41 @@ func (app *application) healthCheck(w http.ResponseWriter, r *http.Request) {
 		Data:    envelope{"status": "ok", "version": "1.0.0"}, // Puedes añadir más información aquí
 	}
 	_ = utils.WriteJSON(w, http.StatusOK, payload)
+}
+
+func (app *application) confirm(w http.ResponseWriter, r *http.Request) {
+
+	var confirm ConfirmRequest
+
+	err := utils.ReadJSON(w, r, &confirm)
+	if err != nil {
+		logger.ErrorLog.Printf("Error al leer JSON en CreateProduct: %v", err)
+		utils.ErrorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	_, err = cognitoClient.ConfirmSignUp(context.TODO(), &cognito.ConfirmSignUpInput{
+		ClientId:         aws.String(ClientID),
+		Username:         aws.String(confirm.Email),
+		ConfirmationCode: aws.String(confirm.Code),
+	})
+	if err != nil {
+		http.Error(w, "Error confirmando usuario: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: "Confirmacion exitosa",
+		Data:    "",
+	}
+
+	err = utils.WriteJSON(w, http.StatusCreated, payload)
+	if err != nil {
+		logger.ErrorLog.Printf("Error al escribir respuesta JSON en CreateProduct: %v", err)
+		// En este punto, no hay mucho que se pueda hacer más que loguear el error
+	}
+
 }
 
 func (app *application) CreateProduct(w http.ResponseWriter, r *http.Request) {

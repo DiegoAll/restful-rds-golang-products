@@ -24,6 +24,14 @@ type application struct {
 	apiKeyRepo  *repository.APIKeyRepository
 }
 
+const (
+	UserPoolID = "us-east-1_ZTzSnlG81"
+	ClientID   = "2oa45rcrl66qophvccaeesdtl9"
+	Region     = "us-east-1" // cambia según tu región
+)
+
+var cognitoClient *cognito.Client
+
 func main() {
 
 	logger.Init()

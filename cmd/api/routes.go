@@ -28,6 +28,8 @@ func (app *application) routes() http.Handler {
 
 		// Rutas públicas de la V1
 		r.Get("/health", app.healthCheck)
+
+		r.Post("/confirm", app.Confirm)
 		// La ruta AllProducts es pública y no requiere API Key
 		// MIDDLEWARE APLICADO
 		r.Get("/products", app.AllProducts) // Endpoint: GET /v1/products/
