@@ -97,3 +97,7 @@ func ErrorJSON(w http.ResponseWriter, err error, status ...int) {
 
 	WriteJSON(w, statusCode, payload) // Usar la función WriteJSON
 }
+
+// func ReadRawJSON(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+
+// }

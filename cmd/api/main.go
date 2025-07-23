@@ -1,13 +1,23 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"restful-rds-golang-products/database"
+	"restful-rds-golang-products/internal/pkg/cognito"
 	"restful-rds-golang-products/internal/pkg/logger"
 	"restful-rds-golang-products/internal/repository"
+
+	//awsconfig "github.com/aws/aws-sdk-go-v2/config"
+	awsconfig "github.com/aws/aws-sdk-go-v2/config"
+
+	//cognito "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
+	//"github.com/aws/aws-sdk-go-v2/config"
+
+	cognitoservice "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 )
 
 type config struct {
@@ -21,7 +31,7 @@ type application struct {
 	db       *database.DB
 	// middleware *middleware.Middleware
 	productRepo *repository.ProductsRepository
-	apiKeyRepo  *repository.APIKeyRepository
+	cognitoAuth cognito.AuthClient
 }
 
 const (
@@ -30,7 +40,7 @@ const (
 	Region     = "us-east-1" // cambia según tu región
 )
 
-var cognitoClient *cognito.Client
+// var cognitoClient *cognito.Client (Global no es necesaria)
 
 func main() {
 
@@ -76,9 +86,15 @@ func main() {
 		log.Fatalf("Cannot connect to PostgreSQL: %v", err)
 	}
 
-	// Inicializar los repositorios
 	productRepo := repository.NewPostgresProductRepository(dbInstance.SQL)
-	apiKeyRepo := repository.NewAPIKeyRepository(dbInstance.SQL)
+	//apiKeyRepo := repository.NewAPIKeyRepository(dbInstance.SQL)
+
+	sdkConfig, err := awsconfig.LoadDefaultConfig(context.TODO(), awsconfig.WithRegion(Region))
+	if err != nil {
+		log.Fatalf("unable to load SDK config, %v", err)
+	}
+	cognitoClient := cognitoservice.NewFromConfig(sdkConfig)
+	cognitoAuthService := cognito.NewCognitoAuth(cognitoClient, UserPoolID, ClientID)
 
 	app := &application{
 		config:      cfg,
@@ -86,8 +102,7 @@ func main() {
 		errorLog:    logger.ErrorLog,
 		db:          dbInstance,
 		productRepo: productRepo,
-		apiKeyRepo:  apiKeyRepo,
-		// middleware: mw,
+		cognitoAuth: cognitoAuthService,
 	}
 
 	err = app.serve()
