@@ -55,6 +55,9 @@ services:
       
       # Define esta variable para TRUE si quieres que la API se conecte a RDS cuando la levantes con Docker Compose.
       # Déjala comentada o en FALSE para que se conecte a la base de datos local.
-      RDS_ENABLED: "true" # Cambia a "true" para conectar a RDS localmente
+      APP_ENV: "development_remote_rds" # Cambia a "true" para conectar a RDS localmente
+      # APP_ENV: "development_local_db"
+      # APP_ENV: "production"
+    
     # depends_on:
     #   - db_postgres

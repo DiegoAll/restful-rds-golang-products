@@ -39,6 +39,8 @@ Aunque técnicamente podrías construir todas las llamadas HTTP y el manejo de s
 
 db.t3.micro
 
+Paso crucial: Aunque Terraform configura la EC2 para poder hablar con la RDS, la RDS necesita una regla de entrada que permita recibir tráfico de la EC2.
+
 ## Run application
 
     docker-compose down -v --rmi all
@@ -64,10 +66,7 @@ db.t3.micro
     }'
 
 
-##  Database Querys
 
-    docker run -p 8081:8081 \
-    -e PORT=8081 \
-    -e POSTGRES_DSN="host=db-instance-rds.c8le640i0kbl.us-east-1.rds.amazonaws.com port=5432 user=p0stgr3s password=p4rc3r02025! dbname=fixture sslmode=require" \
-    your-api-image-name
+## Diseñar componente de middleware o API Gateway
+
 
