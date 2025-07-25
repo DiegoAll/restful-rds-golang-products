@@ -114,6 +114,7 @@ func main() {
 		// Para logging, cuidado de no exponer la contraseña.
 		// Podrías extraer host y dbname del secretMap si quieres más detalle.
 		logger.InfoLog.Printf("Connecting to RDS PostgreSQL from AWS Secrets Manager.")
+		logger.InfoLog.Printf("DSN being used for connection: %s", dsn) // ¡Loguea el DSN real!
 
 	default:
 		log.Fatalf("Error: APP_ENV environment variable is not defined or has an invalid value: %s. Expected 'development_local_db', 'development_remote_rds', 'production', or 'aws'.", appEnv)
