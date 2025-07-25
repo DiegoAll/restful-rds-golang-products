@@ -40,6 +40,8 @@ const (
 func main() {
 	logger.Init()
 
+	appEnv := os.Getenv("APP_ENV")
+	logger.InfoLog.Printf("Application Environment (APP_ENV): %s", appEnv)
 	var cfg config
 	cfg.port = 9090
 
@@ -49,7 +51,7 @@ func main() {
 	}
 
 	var dsn string
-	appEnv := os.Getenv("APP_ENV")
+	//appEnv := os.Getenv("APP_ENV")
 
 	// Declara sdkConfig aquí, una sola vez, para que esté disponible en todo el main.
 	// El tipo debe ser de la V2: "github.com/aws/aws-sdk-go-v2/aws".Config
