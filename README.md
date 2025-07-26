@@ -18,6 +18,17 @@ restful-rds-golang-products
     psql -h db-instance-rds.c8le640i0kbl.us-east-1.rds.amazonaws.com -U p0stgr3s -d products -p 5432
 
 
+    psql -h db-instance-rds-tf.c8le640i0kbl.us-east-1.rds.amazonaws.com -U p0stgr3s -d products -p 5432
+
+
+
+aws rds describe-db-instances \
+    --db-instance-identifier db-instance-rds-tf \
+    --region us-east-1 \
+    --query "DBInstances[0].DBSubnetGroup.Subnets[0].SubnetIdentifier" \
+    --output text
+
+
 ## API Endpoints
 
     curl -X GET http://localhost:9090/v1/products
@@ -33,4 +44,6 @@ restful-rds-golang-products
 
 
 
+
+Se esta harcodeando el pool en main.go (corregir)
 

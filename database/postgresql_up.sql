@@ -22,8 +22,16 @@ CREATE TABLE api_keys (
 CREATE TABLE products (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
-    descripcion TEXT,
-    precio NUMERIC(10,2),
+    description TEXT,
+    price NUMERIC(10,2),
     stock INTEGER,
-    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+
+INSERT INTO api_keys (key, expires_at, active, permissions)
+VALUES ('mi_super_api_key_secreta_123', NULL, TRUE, ARRAY['products:write', 'products:read']);
+-- 'NULL' en expires_at significa que no expira.
+-- 'TRUE' en active significa que está activa.
+-- permissions es opcional, puedes ajustarlo si lo usas.
