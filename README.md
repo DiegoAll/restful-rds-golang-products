@@ -47,3 +47,11 @@ aws rds describe-db-instances \
 
 Se esta harcodeando el pool en main.go (corregir)
 
+JWKS
+
+API Gateway: {"message":"Unauthorized"}
+
+- Las instancias se quedan pegadas, se requiere eliminarlas por la consola web para que el terraform no finalice con error. De lo contrario es necesario ejecutar un comando para remover algun estado pendiente si hay dependencias.
+
+- 
+

@@ -31,11 +31,11 @@ type application struct {
 	cognitoAuth cognito.AuthClient
 }
 
-const (
-	UserPoolID = "us-east-1_ZTzSnlG81"
-	ClientID   = "2oa45rcrl66qophvccaeesdtl9"
-	Region     = "us-east-1"
-)
+// const (
+// 	UserPoolID = "us-east-1_ZTzSnlG81"
+// 	ClientID   = "2oa45rcrl66qophvccaeesdtl9"
+// 	Region     = "us-east-1"
+// )
 
 func main() {
 	logger.Init()
@@ -53,6 +53,21 @@ func main() {
 
 	var dsn string
 	var sdkConfig aws.Config
+
+	userPoolID := os.Getenv("UserPoolID") // Leer desde variable de entorno
+	fmt.Println("👀 UserPoolID cargado desde .env:", userPoolID)
+
+	if userPoolID == "" {
+		log.Fatal("❌ UserPoolID env var is not defined.")
+	}
+	clientID := os.Getenv("ClientID") // Leer desde variable de entorno
+	if clientID == "" {
+		log.Fatal("❌ ClientID env var is not defined.")
+	}
+	region := os.Getenv("Region") // Leer desde variable de entorno
+	if region == "" {
+		log.Fatal("❌ Region env var is not defined.")
+	}
 
 	switch appEnv {
 	case "development_local_db":
@@ -77,7 +92,7 @@ func main() {
 		logger.InfoLog.Printf("🔒 Fetching secret from Secrets Manager: %s", rdsSecretName)
 
 		var err error
-		sdkConfig, err = awsconfig.LoadDefaultConfig(context.TODO(), awsconfig.WithRegion(Region))
+		sdkConfig, err = awsconfig.LoadDefaultConfig(context.TODO(), awsconfig.WithRegion(region))
 		if err != nil {
 			log.Fatalf("❌ Failed to load AWS SDK config: %v", err)
 		}
@@ -125,14 +140,15 @@ func main() {
 	productRepo := repository.NewPostgresProductRepository(dbInstance.SQL)
 
 	if appEnv != "production" && appEnv != "aws" {
-		sdkConfig, err = awsconfig.LoadDefaultConfig(context.TODO(), awsconfig.WithRegion(Region))
+		sdkConfig, err = awsconfig.LoadDefaultConfig(context.TODO(), awsconfig.WithRegion(region))
 		if err != nil {
 			log.Fatalf("❌ Failed to load AWS SDK config for Cognito: %v", err)
 		}
 	}
 
 	cognitoClient := cognitoservice.NewFromConfig(sdkConfig)
-	cognitoAuthService := cognito.NewCognitoAuth(cognitoClient, UserPoolID, ClientID)
+	// cognitoAuthService := cognito.NewCognitoAuth(cognitoClient, UserPoolID, ClientID)
+	cognitoAuthService := cognito.NewCognitoAuth(cognitoClient, userPoolID, clientID)
 
 	app := &application{
 		config:      cfg,
