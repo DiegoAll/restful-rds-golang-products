@@ -2,6 +2,12 @@
 
 restful-rds-golang-products
 
+
+<p align="center">
+  <img src="diagram.jpeg" width="500"/>
+</p>
+
+
     aws ec2 modify-subnet-attribute \
     --subnet-id subnet-07ab674ef6e9292c6 \
     --map-public-ip-on-launch
