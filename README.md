@@ -1,10 +1,11 @@
 # restful-rds-golang-products
 
-restful-rds-golang-products
+RESTful microservice that allows the management of soccer tournament data. It uses AWS cloud resources and
+is provisioned and deployed using Terraform.
 
 
 <p align="center">
-  <img src="diagram.jpeg" width="500"/>
+  <img src="diagram.jpeg" width="600"/>
 </p>
 
 
